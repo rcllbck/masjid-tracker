@@ -14,6 +14,14 @@ Aplikasi Android untuk melacak masjid yang pernah dikunjungi dan mencatat ibadah
 - 🔍 Cari masjid dari daftar
 - 💾 Data tersimpan lokal di perangkat
 
+  ## 📱 Screenshot
+
+<p align="center">
+  <img width= 200 alt="image" src="https://github.com/user-attachments/assets/d18c29f2-5cf6-4917-ad60-734ed77ce278" />
+<img width= 200 alt="WhatsApp Image 2026-05-15 at 2 07 14 PM" src="https://github.com/user-attachments/assets/da3a8eca-7c6f-4f83-95e1-13a86bd6c63d" />
+
+</p>
+
 ## 📥 Download APK
 
 👉 [Download versi terbaru di Releases](../../releases)
