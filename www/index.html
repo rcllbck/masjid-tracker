@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Masjid Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00c897">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Masjid Tracker">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <span class="iconify" data-icon="noto-v1:mosque" data-width="32"></span>
+      <h1>Masjid Tracker</h1>
+    </div>
+    <div class="header-stats">
+      <span id="totalMasjid">0 Masjid</span>
+      <span id="totalSholat">0 Sholat</span>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" id="listBtn">
+      <span class="iconify" data-icon="uim:list-ul" data-width="30"></span>
+      <label>Daftar Masjid</label>
+    </button>
+    <button class="nav-btn nav-btn-main" id="addBtn">
+      <span>+</span>
+    </button>
+    <button class="nav-btn" id="centerBtn">
+      <span class="iconify" data-icon="streamline-plump-color:location-pin-3" data-width="30"></span>
+      <label>Lokasi Saya</label>
+    </button>
+  </div>
+</div>
+
+<!-- Modal tambah masjid -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Tambah Masjid</h2>
+      <button id="adjustMapBtn" class="btn-adjust-map" style="display:none">🗺️ Sesuaikan</button>
+      <button class="btn-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Nama Masjid</label>
+        <input type="text" id="masjidName" placeholder="Tambah/Cari nama masjid..." autocomplete="off">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <div class="form-group">
+        <label>Foto</label>
+        <div class="photo-input">
+          <button id="cameraBtn">📷 Kamera</button>
+          <button id="galleryBtn">🖼️ Galeri</button>
+          <input type="file" id="photoFile" accept="image/*" style="display:none">
+          <input type="file" id="cameraFile" accept="image/*" capture="environment" style="display:none">
+        </div>
+        <img id="photoPreview" style="display:none">
+      </div>
+      <div class="form-group">
+        <label>Lokasi</label>
+        <div class="location-info" id="locationInfo">
+          <span id="locationText">Mengambil lokasi...</span>
+        </div>
+      </div>
+      <button class="btn-simpan" id="simpanBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal landmark -->
+<div class="modal" id="landmarkModal">
+  <div class="modal-content landmark-modal-content">
+    <div class="modal-header">
+      <h2>📌 Tandai Patokan</h2>
+      <button class="btn-close" id="closeLandmarkModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="landmark-hint">Pilih ikon untuk lokasi ini:</p>
+      <div class="landmark-grid" id="landmarkGrid">
+        <button class="landmark-opt" data-icon="emojione-v1:department-store" data-label="Pasar">
+          <span class="iconify" data-icon="emojione-v1:department-store" data-width="32"></span>
+          <span>Pasar</span>
+        </button>
+        <button class="landmark-opt" data-icon="fxemoji:hospital" data-label="RS/Klinik">
+          <span class="iconify" data-icon="fxemoji:hospital" data-width="32"></span>
+          <span>RS/Klinik</span>
+        </button>
+        <button class="landmark-opt" data-icon="emojione:school" data-label="Sekolah">
+          <span class="iconify" data-icon="emojione:school" data-width="32"></span>
+          <span>Sekolah</span>
+        </button>
+        <button class="landmark-opt" data-icon="mdi:bank" data-label="Bank/ATM">
+          <span class="iconify" data-icon="mdi:bank" data-width="32"></span>
+          <span>Bank/ATM</span>
+        </button>
+        <button class="landmark-opt" data-icon="mdi:gas-station" data-label="SPBU">
+          <span class="iconify" data-icon="mdi:gas-station" data-width="32"></span>
+          <span>SPBU</span>
+        </button>
+        <button class="landmark-opt" data-icon="mdi:silverware-fork-knife" data-label="Restoran">
+          <span class="iconify" data-icon="mdi:silverware-fork-knife" data-width="32"></span>
+          <span>Restoran</span>
+        </button>
+        <button class="landmark-opt" data-icon="noto-v1:hotel" data-label="Hotel">
+          <span class="iconify" data-icon="noto-v1:hotel" data-width="32"></span>
+          <span>Hotel</span>
+        </button>
+        <button class="landmark-opt" data-icon="fluent-emoji-flat:bus-stop" data-label="Halte">
+          <span class="iconify" data-icon="fluent-emoji-flat:bus-stop" data-width="32"></span>
+          <span>Halte</span>
+        </button>
+        <button class="landmark-opt" data-icon="fluent-emoji-flat:convenience-store" data-label="Mall/Toko">
+          <span class="iconify" data-icon="fluent-emoji-flat:convenience-store" data-width="32"></span>
+          <span>Mall/Toko</span>
+        </button>
+        <button class="landmark-opt" data-icon="noto-v1:national-park" data-label="Taman">
+          <span class="iconify" data-icon="noto-v1:national-park" data-width="32"></span>
+          <span>Taman</span>
+        </button>
+        <button class="landmark-opt" data-icon="streamline-emojis:office-building" data-label="Gedung">
+          <span class="iconify" data-icon="streamline-emojis:office-building" data-width="32"></span>
+          <span>Gedung</span>
+        </button>
+        <button class="landmark-opt" data-icon="openmoji:location-indicator-red" data-label="__custom__">
+          <span class="iconify" data-icon="openmoji:location-indicator-red" data-width="32"></span>
+          <span>Lainnya</span>
+        </button>
+      </div>
+      <div id="customLabelWrap" style="display:none; margin-top:14px;">
+        <input type="text" id="customLabelInput" class="custom-label-input" placeholder="Nama patokan, mis: Warung Bu Eni..." autocomplete="off">
+        <div style="display:flex; gap:8px; margin-top:8px; justify-content:flex-end;">
+          <button class="btn-cancel-time" id="cancelCustomLabel">Batal</button>
+          <button class="btn-confirm-time" id="confirmCustomLabel">✓ Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel detail masjid -->
+<div class="panel" id="panel">
+  <div class="panel-handle"></div>
+  <div class="panel-photo" id="panelPhoto" style="display:none">
+    <img id="panelImg" src="" alt="foto masjid">
+  </div>
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2 id="panelName">Nama Masjid</h2>
+      <div class="panel-header-actions">
+        <button class="btn-edit-panel" id="editPanelBtn">✏️</button>
+        <button class="btn-close" id="closePanel">✕</button>
+      </div>
+    </div>
+    <div class="panel-stats">
+      <span id="panelSholat">0 Sholat</span>
+      <span id="panelDate"></span>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div id="viewMode">
+      <div class="sholat-buttons" style="margin-bottom:12px">
+        <button class="btn-sholat" data-sholat="Subuh">🌅 Subuh</button>
+        <button class="btn-sholat" data-sholat="Dzuhur">☀️ Dzuhur</button>
+        <button class="btn-sholat" data-sholat="Ashar">🌤️ Ashar</button>
+        <button class="btn-sholat" data-sholat="Maghrib">🌇 Maghrib</button>
+        <button class="btn-sholat" data-sholat="Isya">🌙 Isya</button>
+      </div>
+      <div class="rating-row" id="ratingRow">
+        <span class="rating-label">Rating</span>
+        <div class="stars" id="starsDisplay">
+          <span class="star" data-val="1">★</span>
+          <span class="star" data-val="2">★</span>
+          <span class="star" data-val="3">★</span>
+          <span class="star" data-val="4">★</span>
+          <span class="star" data-val="5">★</span>
+        </div>
+      </div>
+      <div class="view-desc" id="viewDesc"></div>
+      <div class="panel-photos" id="panelPhotos"></div>
+      <div class="sholat-history" id="sholatHistory"></div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div id="editMode" style="display:none">
+      <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px">Tambah sholat dengan waktu manual:</p>
+      <div class="sholat-buttons">
+        <button class="btn-sholat-edit" data-sholat="Subuh">🌅 Subuh</button>
+        <button class="btn-sholat-edit" data-sholat="Dzuhur">☀️ Dzuhur</button>
+        <button class="btn-sholat-edit" data-sholat="Ashar">🌤️ Ashar</button>
+        <button class="btn-sholat-edit" data-sholat="Maghrib">🌇 Maghrib</button>
+        <button class="btn-sholat-edit" data-sholat="Isya">🌙 Isya</button>
+      </div>
+      <div class="sholat-time-form" id="sholatTimeForm" style="display:none">
+        <div class="sholat-time-header">
+          <span id="sholatTimeName">Dzuhur</span>
+          <button class="btn-close-time" id="closeSholatTime">✕</button>
+        </div>
+        <input type="datetime-local" id="sholatTimeInput">
+        <div class="sholat-time-actions">
+          <button class="btn-cancel-time" id="cancelSholatTime">Batal</button>
+          <button class="btn-confirm-time" id="confirmSholatTime">✓ Simpan</button>
+        </div>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Rating</span>
+        <div class="stars" id="starsEdit">
+          <span class="star-edit" data-val="1">★</span>
+          <span class="star-edit" data-val="2">★</span>
+          <span class="star-edit" data-val="3">★</span>
+          <span class="star-edit" data-val="4">★</span>
+          <span class="star-edit" data-val="5">★</span>
+        </div>
+      </div>
+      <textarea id="panelDesc" class="panel-desc" placeholder="Tambah catatan..."></textarea>
+      <button class="btn-save-desc" id="saveDescBtn">Simpan Catatan</button>
+      <div class="panel-photos-row">
+        <button class="btn-add-photo" id="addPhotoBtn">📷 Tambah Foto</button>
+        <input type="file" id="addPhotoFile" accept="image/*" capture="environment" style="display:none">
+      </div>
+      <div class="panel-photos" id="editPhotos"></div>
+      <button class="btn-hapus" id="hapusBtn">🗑️ Hapus Masjid</button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel list masjid -->
+<div class="list-panel" id="listPanel">
+  <div class="list-panel-header">
+    <h2>Daftar Masjid</h2>
+    <button class="btn-close" id="closeListPanel">✕</button>
+  </div>
+  <input type="text" id="listSearch" placeholder="Cari masjid..." class="list-search">
+  <div class="list-items" id="listItems"></div>
+</div>
+
+<!-- Action Sheet -->
+<div class="action-sheet" id="actionSheet">
+  <div class="action-sheet-content">
+    <button class="action-opt" id="actionMasjid">
+      <span class="iconify" data-icon="emojione:mosque" data-width="28"></span>
+      <div>
+        <div class="action-opt-title">Tambah Masjid</div>
+        <div class="action-opt-sub">Simpan masjid ke peta</div>
+      </div>
+    </button>
+    <button class="action-opt" id="actionLandmark">
+      <span class="iconify" data-icon="openmoji:location-indicator-red" data-width="28"></span>
+      <div>
+        <div class="action-opt-title">Tambah Patokan</div>
+        <div class="action-opt-sub">Tandai lokasi penting</div>
+      </div>
+    </button>
+    <button class="action-cancel" id="actionCancel">Batal</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
