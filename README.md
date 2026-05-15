@@ -1,58 +1,63 @@
-# 🕌 Masjid Tracker - Panduan Build APK Android
+# 🕌 Masjid Tracker
 
-## Yang Dibutuhkan
-- **Node.js** v18+ → https://nodejs.org
-- **Android Studio** → https://developer.android.com/studio
-- **JDK 17** (biasanya sudah include di Android Studio)
+Aplikasi Android untuk melacak masjid yang pernah dikunjungi dan mencatat ibadah sholat berjamaah.
 
----
+## ✨ Fitur
 
-## Langkah Build APK
+- 🗺️ Peta interaktif untuk melihat lokasi masjid
+- ➕ Tambah masjid baru via double tap peta atau tombol +
+- 🙏 Catat sholat berjamaah (Subuh, Dzuhur, Ashar, Maghrib, Isya)
+- ⭐ Rating masjid dengan bintang
+- 📷 Foto masjid dari kamera atau galeri
+- 📝 Catatan pribadi per masjid
+- 📌 Tambah patokan lokasi (long press peta)
+- 🔍 Cari masjid dari daftar
+- 💾 Data tersimpan lokal di perangkat
 
-### 1. Install dependencies
+## 📥 Download APK
+
+👉 [Download versi terbaru di Releases](../../releases)
+
+> Install: Buka file APK di HP → izinkan install dari sumber tidak dikenal → Install
+
+## 🛠️ Build dari Source
+
+### Yang Dibutuhkan
+- [Node.js](https://nodejs.org) v18+
+- [Android Studio](https://developer.android.com/studio)
+
+### Langkah-langkah
+
 ```bash
+# 1. Clone repo
+git clone https://github.com/rcllbck/masjid-tracker.git
 cd masjid-tracker
+
+# 2. Install dependencies
 npm install
-```
 
-### 2. Tambah platform Android
-```bash
+# 3. Tambah platform Android
 npx cap add android
-```
 
-### 3. Sync file web ke Android
-```bash
+# 4. Sync file web
 npx cap sync android
-```
 
-### 4. Buka di Android Studio
-```bash
+# 5. Buka di Android Studio
 npx cap open android
 ```
 
-### 5. Build APK di Android Studio
-- Tunggu Gradle sync selesai
-- Menu: **Build → Build Bundle(s) / APK(s) → Build APK(s)**
-- APK ada di: `android/app/build/outputs/apk/debug/app-debug.apk`
+Di Android Studio: **Build → Build Bundle(s) / APK(s) → Build APK(s)**
 
----
+APK ada di: `android/app/build/outputs/apk/debug/`
 
-## Install APK ke HP
-1. Copy file `app-debug.apk` ke HP
-2. Buka file manager, tap APK-nya
-3. Izinkan "Install dari sumber tidak dikenal" jika diminta
-4. Install!
+## 🔧 Teknologi
 
----
+- HTML, CSS, JavaScript
+- [Leaflet.js](https://leafletjs.com) — peta interaktif
+- [Capacitor](https://capacitorjs.com) — wrapper Android native
+- [CartoDB](https://carto.com) — tile peta dark mode
+- [Nominatim](https://nominatim.org) — pencarian nama masjid
 
-## Izin yang Diminta App
-- **Lokasi** - untuk menampilkan posisi Anda di peta
-- **Kamera** - untuk foto masjid
-- **Penyimpanan** - untuk menyimpan foto dari galeri
+## 📄 Lisensi
 
----
-
-## Catatan
-- Data tersimpan di localStorage device (tidak hilang saat app ditutup)
-- Butuh internet untuk load peta (CartoDB tiles) dan pencarian nama masjid (Nominatim)
-- Untuk mode offline penuh, perlu tambahkan tile caching (pengembangan lanjutan)
+MIT License — bebas digunakan dan dimodifikasi.
