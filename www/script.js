@@ -31,7 +31,13 @@ function persistData() {
 }
 
 // ── Inisialisasi Peta ──
-const map = L.map("map", { doubleClickZoom: false }).setView([-6.2, 106.8], 12);
+const map = L.map("map", {
+  doubleClickZoom: false,
+  rotate: true,
+  rotateControl: { closeOnZeroBearing: false },
+  touchRotate: true,
+  bearing: 0
+}).setView([-6.2, 106.8], 12);
 
 navigator.geolocation.getCurrentPosition(
   (pos) => map.flyTo([pos.coords.latitude, pos.coords.longitude], 15, { animate: true, duration: 1 }),
@@ -57,27 +63,38 @@ function makeLandmarkIcon(iconName) {
 
 // ── User location ──
 const userIcon = L.divIcon({
-  html: `<div style="width:16px;height:16px;background:#4a9eff;border:3px solid white;border-radius:50%;box-shadow:0 0 10px rgba(74,158,255,0.6)"></div>`,
-  className: "", iconSize: [16, 16], iconAnchor: [8, 8]
+  html: `<div style="
+    width: 16px;
+    height: 16px;
+    background: #4a9eff;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(74,158,255,0.6);
+  "></div>`,
+  className: "",
+  iconSize: [16, 16],
+  iconAnchor: [8, 8]
 });
 
 let userMarker = null;
 
 function updateUserLocation(pos) {
   const { latitude, longitude } = pos.coords;
-  if (userMarker) userMarker.setLatLng([latitude, longitude]);
-  else userMarker = L.marker([latitude, longitude], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+  if (userMarker) {
+    userMarker.setLatLng([latitude, longitude]);
+  } else {
+    userMarker = L.marker([latitude, longitude], {
+      icon: userIcon,
+      zIndexOffset: 1000
+    }).addTo(map);
+  }
 }
 
-document.getElementById("centerBtn").onclick = () => {
-  if (userMarker) map.setView(userMarker.getLatLng(), 16);
-  else navigator.geolocation.getCurrentPosition(
-    pos => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
-    () => alert("GPS tidak tersedia")
-  );
-};
-
-navigator.geolocation.watchPosition(updateUserLocation, () => {}, { enableHighAccuracy: true });
+navigator.geolocation.watchPosition(
+  updateUserLocation,
+  () => {},
+  { enableHighAccuracy: true }
+);
 
 // ── Masjid Markers ──
 let masjidMarkers = [];
@@ -159,6 +176,15 @@ const sholatTimeInput = document.getElementById("sholatTimeInput");
 const closeSholatTime = document.getElementById("closeSholatTime");
 const cancelSholatTime = document.getElementById("cancelSholatTime");
 const confirmSholatTime = document.getElementById("confirmSholatTime");
+const photoModal = document.getElementById("photoModal");
+const photoModalImg = document.getElementById("photoModalImg");
+
+function openPhotoModal(src) {
+  photoModalImg.src = src;
+  photoModal.classList.add("visible");
+}
+
+photoModal.onclick = () => photoModal.classList.remove("visible");
 
 let activeMasjidId = null;
 let pendingSholatName = null;
@@ -303,7 +329,9 @@ function renderPanelPhotos(m) {
   panelPhotos.innerHTML = "";
   (m.photos || []).forEach(photo => {
     const img = document.createElement("img");
-    img.src = photo; img.className = "panel-photo-item";
+    img.src = photo;
+    img.classList.add("panel-photo-item");
+    img.onclick = () => openPhotoModal(photo); // ⬅️ tambah ini
     panelPhotos.appendChild(img);
   });
 }
@@ -334,6 +362,26 @@ addPhotoFile.onchange = e => {
     save(); renderEditPhotos(masjids[idx]); renderPanelPhotos(masjids[idx]);
   };
   reader.readAsDataURL(file); addPhotoFile.value = "";
+};
+
+const addGalleryBtn = document.getElementById("addGalleryBtn");
+const addGalleryFile = document.getElementById("addGalleryFile");
+
+addGalleryBtn.onclick = () => addGalleryFile.click();
+addGalleryFile.onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const idx = masjids.findIndex(m => m.id === activeMasjidId);
+    if (!masjids[idx].photos) masjids[idx].photos = [];
+    masjids[idx].photos.push(e.target.result);
+    save();
+    renderEditPhotos(masjids[idx]);
+    renderPanelPhotos(masjids[idx]);
+  };
+  reader.readAsDataURL(file);
+  addGalleryFile.value = "";
 };
 
 document.getElementById("hapusBtn").onclick = () => {
