@@ -986,3 +986,24 @@ body {
 }
 
 .custom-label-input:focus { border-color: var(--accent); }
+
+.photo-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-modal.visible {
+  display: flex;
+}
+
+.photo-modal img {
+  max-width: 95%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+}
