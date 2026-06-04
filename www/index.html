@@ -45,6 +45,14 @@
       <label>Lokasi Saya</label>
     </button>
   </div>
+  <div style="text-align:center; font-size:9px; color:var(--text-muted); padding: 2px 0 4px; position:fixed; bottom:64px; width:100%; z-index:999;">
+  Built by rcllbck
+</div>
+
+<div class="photo-modal" id="photoModal">
+  <img id="photoModalImg" src="" alt="">
+</div>
+
 </div>
 
 <!-- Modal tambah masjid -->
@@ -229,8 +237,10 @@
       <textarea id="panelDesc" class="panel-desc" placeholder="Tambah catatan..."></textarea>
       <button class="btn-save-desc" id="saveDescBtn">Simpan Catatan</button>
       <div class="panel-photos-row">
-        <button class="btn-add-photo" id="addPhotoBtn">📷 Tambah Foto</button>
-        <input type="file" id="addPhotoFile" accept="image/*" capture="environment" style="display:none">
+  <button class="btn-add-photo" id="addPhotoBtn">📷 Kamera</button>
+  <button class="btn-add-photo" id="addGalleryBtn">🖼️ Galeri</button>
+  <input type="file" id="addPhotoFile" accept="image/*" capture="environment" style="display:none">
+  <input type="file" id="addGalleryFile" accept="image/*" style="display:none">
       </div>
       <div class="panel-photos" id="editPhotos"></div>
       <button class="btn-hapus" id="hapusBtn">🗑️ Hapus Masjid</button>
@@ -270,6 +280,7 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
 <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 <script src="script.js"></script>
 </body>
